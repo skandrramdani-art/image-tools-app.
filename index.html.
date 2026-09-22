@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة ضغط وتحويل الصور مجاناً</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: #2c3e50; font-size: 24px; margin-bottom: 20px; }
+        .drop-zone { border: 2px dashed #007bff; padding: 30px; border-radius: 8px; cursor: pointer; background: #f8f9fa; }
+        input[type="file"] { display: none; }
+        select, button { padding: 10px 15px; margin-top: 15px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; }
+        button { background: #007bff; color: #fff; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        #preview { max-width: 100%; margin-top: 20px; border-radius: 8px; display: none; }
+        #result { margin-top: 20px; font-weight: bold; color: #28a745; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>مُحول ومكثف الصور الذكي</h1>
+    <div class="drop-zone" onclick="document.getElementById('imageInput').click()">
+        اضغط هنا لاختيار صورة من جهازك
+    </div>
+    <input type="file" id="imageInput" accept="image/*">
+    
+    <br>
+    <label>إلى صيغة:</label>
+    <select id="formatSelect">
+        <option value="image/webp">WebP (الأفضل للمواقع)</option>
+        <option value="image/jpeg">JPEG</option>
+        <option value="image/png">PNG</option>
+    </select>
+
+    <br>
+    <button onclick="processImage()">تحويل وضغط الآن</button>
+
+    <br>
+    <img id="preview" alt="معاينة الصورة">
+    <div id="result"></div>
+    <a id="downloadBtn" style="display:none;" download="converted-image">
+        <button style="background:#28a745;">تحميل الصورة الجديدة</button>
+    </a>
+</div>
+
+<script>
+    let loadedImage = null;
+
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                loadedImage = new Image();
+                loadedImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function processImage() {
+        if (!loadedImage) {
+            alert('الرجاء اختيار صورة أولاً!');
+            return;
+        }
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = loadedImage.width;
+        canvas.height = loadedImage.height;
+
+        ctx.drawImage(loadedImage, 0, 0);
+
+        const selectedFormat = document.getElementById('formatSelect').value;
+        const convertedDataUrl = canvas.toDataURL(selectedFormat, 0.8);
+
+        const preview = document.getElementById('preview');
+        preview.src = convertedDataUrl;
+        preview.style.display = 'block';
+
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.href = convertedDataUrl;
+        downloadBtn.style.display = 'inline-block';
+
+        document.getElementById('result').innerText = 'تم تحويل وضغط الصورة بنجاح!';
+    }
+</script>
+
+</body>
+</html>
