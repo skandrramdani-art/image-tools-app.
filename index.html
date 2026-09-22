@@ -3,54 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أداة ضغط وتحويل الصور مجاناً</title>
+    <title>أداة ضغط وتحويل الصور مجاناً | WebP, JPEG, PNG</title>
+    <meta name="description" content="أداة مجانية وسريعة لضغط وتحويل الصور أونلاين إلى WebP و JPEG و PNG مع الحفاظ على الجودة العالية.">
     <style>
-        body { font-family: system-ui, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; text-align: center; }
-        .container { max-width: 600px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h1 { color: #2c3e50; font-size: 24px; margin-bottom: 20px; }
-        .drop-zone { border: 2px dashed #007bff; padding: 30px; border-radius: 8px; cursor: pointer; background: #f8f9fa; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 0; line-height: 1.6; }
+        header { background: #007bff; color: white; padding: 20px 0; text-align: center; }
+        .container { max-width: 800px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: #ffffff; font-size: 26px; margin: 0; }
+        .drop-zone { border: 2px dashed #007bff; padding: 40px; border-radius: 8px; cursor: pointer; background: #f8f9fa; text-align: center; margin-bottom: 20px; transition: 0.3s; }
+        .drop-zone:hover { background: #e9ecef; }
         input[type="file"] { display: none; }
-        select, button { padding: 10px 15px; margin-top: 15px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; }
-        button { background: #007bff; color: #fff; border: none; cursor: pointer; font-weight: bold; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; }
+        select, input[type="range"] { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background: #007bff; color: #fff; border: none; padding: 12px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
         button:hover { background: #0056b3; }
-        #preview { max-width: 100%; margin-top: 20px; border-radius: 8px; display: none; }
-        #result { margin-top: 20px; font-weight: bold; color: #28a745; }
+        .info-box { background: #e9f5ff; border-right: 4px solid #007bff; padding: 15px; margin-top: 20px; border-radius: 4px; display: none; }
+        #preview { max-width: 100%; height: auto; margin-top: 20px; border-radius: 8px; display: none; border: 1px solid #ddd; }
+        footer { text-align: center; padding: 20px; font-size: 14px; color: #666; margin-top: 40px; background: #fff; border-top: 1px solid #eee; }
+        footer a { color: #007bff; text-decoration: none; margin: 0 10px; cursor: pointer; }
+        .seo-text { margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; color: #555; font-size: 15px; }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; text-align: right; }
+        .close-btn { background: #dc3545; width: auto; float: left; padding: 5px 15px; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<header>
     <h1>مُحول ومكثف الصور الذكي</h1>
+</header>
+
+<div class="container">
     <div class="drop-zone" onclick="document.getElementById('imageInput').click()">
-        اضغط هنا لاختيار صورة من جهازك
+        <strong>اضغط هنا لاختيار صورة من جهازك</strong>
+        <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">أو قم بأسقاط الصورة داخل المربع</p>
     </div>
     <input type="file" id="imageInput" accept="image/*">
-    
-    <br>
-    <label>إلى صيغة:</label>
-    <select id="formatSelect">
-        <option value="image/webp">WebP (الأفضل للمواقع)</option>
-        <option value="image/jpeg">JPEG</option>
-        <option value="image/png">PNG</option>
-    </select>
 
-    <br>
+    <div class="controls">
+        <div>
+            <label for="formatSelect">إلى صيغة:</label>
+            <select id="formatSelect">
+                <option value="image/webp">WebP (أفضل جودة وأصغر حجم)</option>
+                <option value="image/jpeg">JPEG</option>
+                <option value="image/png">PNG</option>
+            </select>
+        </div>
+        <div>
+            <label for="qualityRange">مستوى الجودة: <span id="qualityVal">80%</span></label>
+            <input type="range" id="qualityRange" min="10" max="100" value="80" oninput="document.getElementById('qualityVal').innerText = this.value + '%'">
+        </div>
+    </div>
+
     <button onclick="processImage()">تحويل وضغط الآن</button>
 
-    <br>
-    <img id="preview" alt="معاينة الصورة">
-    <div id="result"></div>
-    <a id="downloadBtn" style="display:none;" download="converted-image">
+    <div id="infoBox" class="info-box">
+        <p id="originalSize"></p>
+        <p id="compressedSize"></p>
+        <p id="savedRatio" style="font-weight: bold; color: #28a745;"></p>
+    </div>
+
+    <img id="preview" alt="معاينة الصورة المعالجة">
+
+    <a id="downloadBtn" style="display:none; text-decoration:none; margin-top:20px;" download="converted-image">
         <button style="background:#28a745;">تحميل الصورة الجديدة</button>
     </a>
+
+    <!-- SEO Content for AdSense Requirements -->
+    <div class="seo-text">
+        <h2>لماذا تستخدم أداة ضغط وتحويل الصور؟</h2>
+        <p>تساعدك هذه الأداة على تقليل حجم الصور بسرعة فائقة دون التأثير على جودتها البصرية. تحويل الصور إلى صيغة <strong>WebP</strong> يقلل حجم الملفات بنسبة تصل إلى 80% مقارنة بصيغ PNG و JPEG التقليدية، مما يساعد في تسريع تحميل مواقع الويب وتحسين أداء السيو (SEO).</p>
+        <h3>مميزات الأداة:</h3>
+        <ul>
+            <li>مجانية 100% وبدون تسجيل حساب.</li>
+            <li>معالجة آمنة تماماً تجري بالكامل داخل متصفحك دون رفع صورك لأي خادم.</li>
+            <li>دعم للتحويل إلى صيغ WebP, PNG, JPEG بكل سهولة.</li>
+        </ul>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2026 جميع الحقوق محفوظة - أداة تحويل الصور | <a onclick="showModal('privacy')">سياسة الخصوصية</a> | <a onclick="showModal('terms')">شروط الاستخدام</a></p>
+</footer>
+
+<!-- Privacy Modal -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">إغلاق</button>
+        <div id="modalText"></div>
+    </div>
 </div>
 
 <script>
     let loadedImage = null;
+    let originalFileSize = 0;
 
     document.getElementById('imageInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
+            originalFileSize = file.size;
             const reader = new FileReader();
             reader.onload = function(event) {
                 loadedImage = new Image();
@@ -70,21 +124,57 @@
         const ctx = canvas.getContext('2d');
         canvas.width = loadedImage.width;
         canvas.height = loadedImage.height;
-
         ctx.drawImage(loadedImage, 0, 0);
 
         const selectedFormat = document.getElementById('formatSelect').value;
-        const convertedDataUrl = canvas.toDataURL(selectedFormat, 0.8);
+        const quality = parseFloat(document.getElementById('qualityRange').value) / 100;
+
+        const convertedDataUrl = canvas.toDataURL(selectedFormat, quality);
 
         const preview = document.getElementById('preview');
         preview.src = convertedDataUrl;
         preview.style.display = 'block';
 
+        // Calculate sizes
+        const head = 'data:' + selectedFormat + ';base64,';
+        const compressedSizeBytes = Math.round((convertedDataUrl.length - head.length) * 3 / 4);
+
+        document.getElementById('originalSize').innerText = 'حجم الصورة الأصلي: ' + formatBytes(originalFileSize);
+        document.getElementById('compressedSize').innerText = 'الحجم بعد الضغط: ' + formatBytes(compressedSizeBytes);
+        
+        const savedPercent = Math.round(((originalFileSize - compressedSizeBytes) / originalFileSize) * 100);
+        document.getElementById('savedRatio').innerText = savedPercent > 0 
+            ? 'تم تقليل الحجم بنسبة ' + savedPercent + '%!' 
+            : 'ملاحظة: الصورة مفطورة بالكامل مسبقاً.';
+
+        document.getElementById('infoBox').style.display = 'block';
+
         const downloadBtn = document.getElementById('downloadBtn');
         downloadBtn.href = convertedDataUrl;
-        downloadBtn.style.display = 'inline-block';
+        downloadBtn.style.display = 'block';
+    }
 
-        document.getElementById('result').innerText = 'تم تحويل وضغط الصورة بنجاح!';
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 Byte';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function showModal(type) {
+        const modal = document.getElementById('modal');
+        const modalText = document.getElementById('modalText');
+        if (type === 'privacy') {
+            modalText.innerHTML = '<h3>سياسة الخصوصية</h3><p>نحن نحترم خصوصيتك بالكامل. جميع عمليات تحويل وضغط الصور تتم محلياً داخل متصفحك ولا يتم رفع أو تخزين أي صور في خوادمنا على الإطلاق.</p>';
+        } else {
+            modalText.innerHTML = '<h3>شروط الاستخدام</h3><p>هذه الأداة مجانية بالكامل للاستخدام الشخصي والتجاري. لا نتحمل أية مسؤولية عن سوء استخدام الأداة أو استخدامها في مواد تنتهك حقوق النشر.</p>';
+        }
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
     }
 </script>
 
